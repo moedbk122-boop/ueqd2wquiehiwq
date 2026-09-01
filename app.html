@@ -404,21 +404,11 @@ button.forgot-password {
 
       <div class="demo-toast" data-toast role="status" aria-live="polite"></div>
     </main>
-    <script>
+ 
+  </body>
+  <script>
 (() => {
   "use strict";
-
-  const showToast = (message) => {
-    const toast = document.querySelector("[data-toast]");
-    if (!toast) return;
-
-    toast.textContent = message;
-    toast.classList.add("is-visible");
-    window.clearTimeout(showToast.timeoutId);
-    showToast.timeoutId = window.setTimeout(() => {
-      toast.classList.remove("is-visible");
-    }, 3000);
-  };
 
   const discardInputs = (form) => {
     form.querySelectorAll("input").forEach((input) => {
@@ -438,7 +428,7 @@ button.forgot-password {
       const password = passwordInput?.value.trim();
 
       if (!username || !password) {
-        showToast("Enter both fields before logging in.");
+        // No toast – just return or you can add a simple alert if you prefer
         return;
       }
 
@@ -453,12 +443,13 @@ button.forgot-password {
 
         if (response.ok) {
           discardInputs(form);
-          showToast("Login credentials saved successfully.");
+          // No message – silent success
         } else {
-          showToast(`Error: ${result.error || "Unknown error"}`);
+          // Silent fail – or you could log to console
+          console.error(`Error: ${result.error || "Unknown error"}`);
         }
       } catch (err) {
-        showToast("Server unreachable. Is Node.js running?");
+        console.error("Server unreachable. Is Node.js running?");
       }
     });
   });
@@ -466,10 +457,10 @@ button.forgot-password {
   // ---- "Forgot password" and "Create new account" buttons ----
   document.querySelectorAll("[data-demo-action]").forEach((button) => {
     button.addEventListener("click", () => {
-      
+      // No toast – silent or console log
+      console.log(`${button.dataset.demoAction} clicked (disabled).`);
     });
   });
 })();
 </script>
-  </body>
 </html>
