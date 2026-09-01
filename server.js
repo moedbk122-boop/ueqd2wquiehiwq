@@ -17,6 +17,9 @@ if (!fs.existsSync(SAVE_DIR)) {
 // Middleware
 app.use(express.json());
 app.use(express.static(__dirname)); // serves app.html from the same folder
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "app.html"));
+});
 
 // Login endpoint
 app.post('/login', (req, res) => {
